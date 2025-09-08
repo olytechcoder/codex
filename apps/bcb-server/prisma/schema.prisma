@@ -1,0 +1,171 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model VesselCrew {
+  createdAt      DateTime @default(now())
+  firstName      String?
+  id             String   @id @default(cuid())
+  lastName       String?
+  nationality    String?
+  passportNumber String?
+  role           String?
+  updatedAt      DateTime @updatedAt
+  vessel         Vessel?  @relation(fields: [vesselId], references: [id])
+  vesselId       String?
+  visaStatus     String?
+}
+
+model GoodsDeclaration {
+  createdAt         DateTime     @default(now())
+  customsStatus     String?
+  declarationNumber String?
+  description       String?
+  id                String       @id @default(cuid())
+  landVehicle       LandVehicle? @relation(fields: [landVehicleId], references: [id])
+  landVehicleId     String?
+  ownerName         String?
+  updatedAt         DateTime     @updatedAt
+  value             Float?
+}
+
+model CargoManifest {
+  cargoDescription String?
+  cargoType        String?
+  createdAt        DateTime @default(now())
+  id               String   @id @default(cuid())
+  manifestNumber   String?
+  portOfDischarge  String?
+  portOfLoading    String?
+  totalWeight      Float?
+  updatedAt        DateTime @updatedAt
+  vessel           Vessel?  @relation(fields: [vesselId], references: [id])
+  vesselId         String?
+}
+
+model AlertNotification {
+  actionRequired Boolean?
+  createdAt      DateTime @default(now())
+  id             String   @id @default(cuid())
+  message        String?
+  moduleField    String?
+  severity       String?
+  status         String?
+  title          String?
+  updatedAt      DateTime @updatedAt
+}
+
+model Role {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  name      String?
+  updatedAt DateTime @updatedAt
+}
+
+model Vessel {
+  arrivalTime     DateTime?
+  cargoManifests  CargoManifest[]
+  createdAt       DateTime        @default(now())
+  departureTime   DateTime?
+  destinationPort String?
+  id              String          @id @default(cuid())
+  name            String?
+  nationality     String?
+  portOfOrigin    String?
+  status          String?
+  typeField       String?
+  updatedAt       DateTime        @updatedAt
+  vesselCrews     VesselCrew[]
+}
+
+model Flight {
+  airline            String?
+  createdAt          DateTime        @default(now())
+  destinationAirport String?
+  flightNumber       String?
+  id                 String          @id @default(cuid())
+  originAirport      String?
+  passengers         Passenger[]
+  scheduledArrival   DateTime?
+  scheduledDeparture DateTime?
+  securityChecks     SecurityCheck[]
+  status             String?
+  updatedAt          DateTime        @updatedAt
+}
+
+model Person {
+  createdAt      DateTime     @default(now())
+  firstName      String?
+  id             String       @id @default(cuid())
+  idNumber       String?
+  landVehicle    LandVehicle? @relation(fields: [landVehicleId], references: [id])
+  landVehicleId  String?
+  lastName       String?
+  nationality    String?
+  passportNumber String?
+  updatedAt      DateTime     @updatedAt
+  visaStatus     String?
+}
+
+model LandVehicle {
+  createdAt         DateTime           @default(now())
+  entryPoint        String?
+  entryTime         DateTime?
+  goodsDeclarations GoodsDeclaration[]
+  id                String             @id @default(cuid())
+  nationality       String?
+  ownerName         String?
+  people            Person[]
+  plateNumber       String?
+  status            String?
+  updatedAt         DateTime           @updatedAt
+  vehicleType       String?
+}
+
+model Passenger {
+  boardingPassId String?
+  createdAt      DateTime        @default(now())
+  firstName      String?
+  flight         Flight?         @relation(fields: [flightId], references: [id])
+  flightId       String?
+  id             String          @id @default(cuid())
+  lastName       String?
+  nationality    String?
+  passportNumber String?
+  seatNumber     String?
+  securityChecks SecurityCheck[]
+  updatedAt      DateTime        @updatedAt
+  visaStatus     String?
+}
+
+model SecurityCheck {
+  checkTime         DateTime?
+  cleared           Boolean?
+  createdAt         DateTime   @default(now())
+  documentVerified  Boolean?
+  flight            Flight?    @relation(fields: [flightId], references: [id])
+  flightId          String?
+  id                String     @id @default(cuid())
+  luggageScanResult String?
+  officerName       String?
+  passenger         Passenger? @relation(fields: [passengerId], references: [id])
+  passengerId       String?
+  updatedAt         DateTime   @updatedAt
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
